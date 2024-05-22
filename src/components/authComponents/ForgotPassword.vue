@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { goToLogin } from '../../router/navigation';
 export default {
   name: 'ForgotPassword',
   data() {
@@ -55,6 +56,7 @@ export default {
     resetPassword() {
       // firebase reset password
       // if (this.isEmailValid) {
+      goToLogin(this.$router, this);
       console.log('PWD wil be reset, control the email');
       // }
     },
@@ -66,7 +68,6 @@ export default {
       this.createUser(this.formData.email, this.formData.password);
     },
     closeForgotPasswor() {
-      this.tab = 'login';
       goToLogin(this.$router, this);
     },
   },

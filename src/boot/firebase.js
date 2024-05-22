@@ -23,15 +23,15 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
-const analytics = getAnalytics(firebaseApp);
+const firebase = initializeApp(firebaseConfig);
+const auth = getAuth(firebase);
+const analytics = getAnalytics(firebase);
 const provider = new GoogleAuthProvider();
 
-firebaseApp.getCurrentUser = () => {
+firebase.getCurrentUser = () => {
   /* restituisce una Promise che viene risolta con l'utente attualmente autenticato quando la sua autenticazione cambia.*/
   return new Promise((resolve, reject) => {
-    /*Promise, viene utilizzata la funzione firebaseApp.auth().onAuthStateChanged() per ascoltare/listener i cambiamenti di stato dell'autenticazione.
+    /*Promise, viene utilizzata la funzione firebase.auth().onAuthStateChanged() per ascoltare/listener i cambiamenti di stato dell'autenticazione.
      Questa funzione viene chiamata ogni volta che lo stato dell'autenticazione dell'utente cambia. */
     const unsubscribe = onAuthStateChanged((user) => {
       /*Una volta che viene rilevato un cambiamento di stato, l'utente viene risolto dalla Promise e restituito. */
@@ -43,17 +43,17 @@ firebaseApp.getCurrentUser = () => {
 
 export default boot(({ app, router }) => {
   /*Registro le proprietà globali nell'istanza di Vue,
-   rendendo firebaseApp, analytics e auth accessibili in tutti i
+   rendendo firebase, analytics e auth accessibili in tutti i
    componenti dell'applicazione Vue senza doverli importare ogni volta.
    Questo è utile per semplificare l'accesso a queste istanze in tutta l'applicazione. */
-  app.config.globalProperties.$firebaseApp = firebaseApp;
+  app.config.globalProperties.$firebase = firebase;
   app.config.globalProperties.$analytics = analytics;
   app.config.globalProperties.$auth = auth;
   app.config.globalProperties.$provider = provider;
 
   router.beforeEach(async (to, from, next) => {
     const auth = to.meta.requiresAuth;
-    if (auth && !(await firebaseApp.getCurrentUser())) {
+    if (auth && !(await firebase.getCurrentUser())) {
       next();
     } else {
       next();
@@ -61,4 +61,4 @@ export default boot(({ app, router }) => {
   });
 });
 
-export { firebaseApp, analytics, auth, provider };
+export { firebase, analytics, auth, provider };

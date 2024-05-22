@@ -92,8 +92,7 @@ export default {
       }
     },
     goToForgotPassword() {
-      const pwdControll = goToForgotPw(this.$router, this);
-      return pwdControll;
+      goToForgotPw(this.$router, this);
     },
     // validateEmail() {
     //   this.isEmailValid = this.$refs.resetPasswordForm.validate();
