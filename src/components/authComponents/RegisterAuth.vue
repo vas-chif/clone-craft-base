@@ -41,6 +41,9 @@
 </template>
 
 <script>
+import { goToLogin } from '../../router/navigation';
+import { CreateUser } from '../../service/AuthService';
+import { SignInOrSignUpWithGoogle } from '../../service/AuthServiceWithGoogle';
 export default {
   name: 'RegisterAuth',
   data() {
@@ -52,16 +55,27 @@ export default {
     };
   },
   methods: {
-    google() {
-      console.log('google login & signup');
+    async google() {
+      try {
+        const user = await SignInOrSignUpWithGoogle();
+        if (user) {
+          console.log('User signed in with Google:', user);
+          goToLogin(this.$router, this); // Redirect to login page after successful registration
+        } else {
+          console.error('Google sign-in did not return a valid user');
+        }
+      } catch (error) {
+        console.error('Error during Google sign-in:', error);
+      }
     },
-    submitForm() {
-      // this.$emit('submitForm', this.formData);
-      this.createUser(this.formData.email, this.formData.password);
-    },
-    /*method createUser */
-    createUser(email, password) {
-      console.log(email, password);
+
+    async submitForm() {
+      try {
+        await CreateUser(this.formData.email, this.formData.password);
+        goToLogin(this.$router, this); // Redirect to login page after successful registration
+      } catch (error) {
+        console.error('Failed to create user', error);
+      }
     },
   },
 };

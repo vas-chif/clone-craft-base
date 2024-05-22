@@ -41,7 +41,7 @@
         label="Forgot Password?"
         color="green"
         class="text-capitalize rounded-borders"
-        @click="goToForgotPw"
+        @click="goToForgotPassword"
       />
     </div>
     <div class="row">
@@ -49,17 +49,16 @@
       <q-btn type="submit" color="primary" label="Login" />
     </div>
   </q-form>
-  <q-dialog v-model="resetPwdDialog">
-    <ForgotPassword />
-  </q-dialog>
 </template>
 
 <script>
 /*eslint-disable*/
-import ForgotPassword from './ForgotPassword.vue';
+import { goToHome, goToForgotPw } from '../../router/navigation';
+import { SignInExistingUser } from '../../service/SingInService';
+import { SignInOrSignUpWithGoogle } from '../../service/AuthServiceWithGoogle';
+
 export default {
   name: 'LoginAuth',
-  components: { ForgotPassword },
   data() {
     return {
       formData: {
@@ -70,25 +69,37 @@ export default {
     };
   },
   methods: {
-    google() {
-      console.log('google login & signup');
+    async google() {
+      try {
+        const user = await SignInOrSignUpWithGoogle();
+        console.log('User signed in with Google:', user);
+        goToHome(this.$router, this);
+      } catch (error) {
+        console.error('Error during Google sign-in:', error);
+      }
     },
-    submitForm() {
-      // this.$emit('submitForm', this.formData);
-      this.signInExistingUser(this.formData.email, this.formData.password);
+    async submitForm() {
+      try {
+        const user = await SignInExistingUser(
+          this.formData.email,
+          this.formData.password
+        );
+        if (user) {
+          goToHome(this.$router, this);
+        }
+      } catch (error) {
+        console.error('Failed to login', error);
+      }
+    },
+    goToForgotPassword() {
+      const pwdControll = goToForgotPw(this.$router, this);
+      return pwdControll;
     },
     // validateEmail() {
     //   this.isEmailValid = this.$refs.resetPasswordForm.validate();
     // },
     /*method  signInExistingUser*/
-    signInExistingUser(email, password) {
-      console.log(email, password);
-    },
 
-    goToForgotPw() {
-      this.tab = 'forgot-password';
-      this.$router.push('/forgot-password'); // Navigate to the login page
-    },
     /*method  forgotPassword*/
     forgotPassword() {
       this.resetPwdDialog = true;

@@ -3,6 +3,8 @@ import { boot } from 'quasar/wrappers';
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
+import { getAuth, onAuthStateChanged, GoogleAuthProvider } from 'firebase/auth';
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -11,6 +13,8 @@ import { getAnalytics } from 'firebase/analytics';
 const firebaseConfig = {
   apiKey: 'AIzaSyChnKQTJndSz2OsfIERoKjgQmm85KbTgxw',
   authDomain: 'craft-base-prototype.firebaseapp.com',
+  databaseURL:
+    'https://craft-base-prototype-default-rtdb.europe-west1.firebasedatabase.app',
   projectId: 'craft-base-prototype',
   storageBucket: 'craft-base-prototype.appspot.com',
   messagingSenderId: '1018160615553',
@@ -19,25 +23,37 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const firebase = initializeApp(firebaseConfig);
-const analytics = getAnalytics(firebase);
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const analytics = getAnalytics(firebaseApp);
+const provider = new GoogleAuthProvider();
 
-firebase.getCurrentUser = () => {
+firebaseApp.getCurrentUser = () => {
+  /* restituisce una Promise che viene risolta con l'utente attualmente autenticato quando la sua autenticazione cambia.*/
   return new Promise((resolve, reject) => {
-    const unsubscribe = firebase.auth().onAutstateChanget((user) => {
-      unsubscribe();
-      resolve(user);
-    }, reject);
+    /*Promise, viene utilizzata la funzione firebaseApp.auth().onAuthStateChanged() per ascoltare/listener i cambiamenti di stato dell'autenticazione.
+     Questa funzione viene chiamata ogni volta che lo stato dell'autenticazione dell'utente cambia. */
+    const unsubscribe = onAuthStateChanged((user) => {
+      /*Una volta che viene rilevato un cambiamento di stato, l'utente viene risolto dalla Promise e restituito. */
+      unsubscribe(); // Rimuove il listener
+      resolve(user); // Risolve la Promise con l'utente corrente
+    }, reject); // Gestisce eventuali errori durante la Promise
   });
 };
 
 export default boot(({ app, router }) => {
-  app.config.globalProperties.$firebase = firebase;
+  /*Registro le proprietà globali nell'istanza di Vue,
+   rendendo firebaseApp, analytics e auth accessibili in tutti i
+   componenti dell'applicazione Vue senza doverli importare ogni volta.
+   Questo è utile per semplificare l'accesso a queste istanze in tutta l'applicazione. */
+  app.config.globalProperties.$firebaseApp = firebaseApp;
   app.config.globalProperties.$analytics = analytics;
+  app.config.globalProperties.$auth = auth;
+  app.config.globalProperties.$provider = provider;
 
   router.beforeEach(async (to, from, next) => {
     const auth = to.meta.requiresAuth;
-    if (auth && !(await firebase.getCurrentUser())) {
+    if (auth && !(await firebaseApp.getCurrentUser())) {
       next();
     } else {
       next();
@@ -45,4 +61,4 @@ export default boot(({ app, router }) => {
   });
 });
 
-export { firebase, analytics };
+export { firebaseApp, analytics, auth, provider };

@@ -5,7 +5,7 @@
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">Reset Password</div>
           <q-space />
-          <!-- <q-btn icon="close" flat round dense v-close-popup /> -->
+          <q-btn icon="close" flat round dense @click="closeForgotPasswor" />
         </q-card-section>
         <q-card-section class="q-pt-md">
           <q-form ref="resetPasswordForm">
@@ -64,6 +64,10 @@ export default {
     submitForm() {
       // this.$emit('submitForm', this.formData);
       this.createUser(this.formData.email, this.formData.password);
+    },
+    closeForgotPasswor() {
+      this.tab = 'login';
+      goToLogin(this.$router, this);
     },
   },
 };

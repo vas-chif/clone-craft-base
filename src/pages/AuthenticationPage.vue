@@ -31,6 +31,7 @@
 /*eslint-disable*/
 import AuthComponent from 'components/AuthComponent.vue';
 import { computed } from 'vue';
+import { goToLogin, goToRegister } from '../router/navigation';
 export default {
   components: { AuthComponent },
   data() {
@@ -38,22 +39,31 @@ export default {
       tab: 'login',
     };
   },
-  computed: {
-    isHomePage() {
-      return this.$router.path === `/`;
+  watch: {
+    $route: {
+      immediate: true,
+      handler(newRoute) {
+        this.selectRoutes(newRoute.path);
+      },
     },
   },
+  created() {
+    this.selectRoutes(this.$route.path);
+  },
+
   methods: {
-    changeTab(tab) {
-      this.tab = tab;
+    selectRoutes(path) {
+      this.updateTabFromRoute(path);
+    },
+    updateTabFromRoute(path) {
+      const routeSegments = path.split('/');
+      this.tab = routeSegments[routeSegments.length - 1] || 'login';
     },
     goToLogin() {
-      this.tab = 'login';
-      this.$router.push('/login'); // Navigate to the login page
+      goToLogin(this.$router, this); // Utilizza la funzione importata
     },
     goToRegister() {
-      this.tab = 'register';
-      this.$router.push('/register'); // Navigate to the register page
+      goToRegister(this.$router, this); // Utilizza la funzione importata
     },
   },
 };
