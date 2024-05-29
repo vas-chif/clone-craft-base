@@ -1,7 +1,7 @@
 <template>
   <q-form @submit="submitForm">
     <div class="flex flex-center">
-      <q-card style="width: 800px; max-width: 40vw">
+      <q-card style="width: 800px; min-width: 50%; max-width: 40vw">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">Reset Password</div>
           <q-space />

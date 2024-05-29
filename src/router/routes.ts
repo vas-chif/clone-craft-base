@@ -26,11 +26,18 @@ const routes: RouteRecordRaw[] = [
           // },
         ],
       },
+
       {
         path: '/forgot-password',
         component: () =>
           import('src/components/authComponents/ForgotPassword.vue'),
       },
+      {
+        path: '/profile-completion',
+        component: () =>
+          import('src/components/authComponents/ProfileCompletion.vue'),
+      },
+
       { path: '/home', component: () => import('src/pages/HomePage.vue') },
     ],
   },

@@ -24,3 +24,11 @@ export function goToForgotPw(router: Router, component: { tab: string }) {
   component.tab = 'forgot-password';
   router.push('/forgot-password');
 }
+
+export function goToProfileCompletion(
+  router: Router,
+  component: { tab: string }
+) {
+  component.tab = 'profile-completion';
+  router.push('/profile-completion');
+}

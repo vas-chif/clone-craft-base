@@ -1,4 +1,8 @@
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from 'firebase/auth';
 
 /*method creatuser exported in  RegisterAuth.vur*/
 export async function CreateUser(email: string, password: string) {
@@ -9,7 +13,11 @@ export async function CreateUser(email: string, password: string) {
       email,
       password
     );
-    console.log('User created: ', userCredential.user);
+    // console.log('User created: ', userCredential.user);
+
+    await sendEmailVerification(userCredential.user);
+    console.log('Verification email sent to:', userCredential.user.email);
+
     return userCredential.user;
   } catch (error) {
     console.error('Error creating user', error);

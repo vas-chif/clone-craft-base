@@ -43,7 +43,9 @@
 <script>
 import { goToLogin } from '../../router/navigation';
 import { CreateUser } from '../../service/AuthService';
+import { SaveUserInfo } from '../../service/UserService';
 import { SignInOrSignUpWithGoogle } from '../../service/AuthServiceWithGoogle';
+
 export default {
   name: 'RegisterAuth',
   data() {
@@ -59,8 +61,19 @@ export default {
       try {
         const user = await SignInOrSignUpWithGoogle();
         if (user) {
-          console.log('User signed in with Google:', user);
+          const userInfo = {
+            uid: user.uid,
+            email: user.email,
+            emailVerified: user.emailVerified,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            phoneNumber: user.phoneNumber,
+            address: null, // Assuming address is not provided by Google Sign-In
+            metadata: user.metadata,
+          };
+          await SaveUserInfo(userInfo.uid, userInfo);
           goToLogin(this.$router, this); // Redirect to login page after successful registration
+          console.log('User signed in with Google:', user);
         } else {
           console.error('Google sign-in did not return a valid user');
         }
@@ -71,8 +84,24 @@ export default {
 
     async submitForm() {
       try {
-        await CreateUser(this.formData.email, this.formData.password);
-        goToLogin(this.$router, this); // Redirect to login page after successful registration
+        const user = await CreateUser(
+          this.formData.email,
+          this.formData.password
+        );
+        if (user) {
+          const userInfo = {
+            uid: user.uid,
+            email: user.email,
+            emailVerified: user.emailVerified,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            phoneNumber: null, // Assuming phone number is not provided at registration
+            address: null, // Assuming address is not provided at registration
+            metadata: user.metadata,
+          };
+          await SaveUserInfo(userInfo.uid, userInfo);
+          goToLogin(this.$router, this); // Redirect to login page after successful registration
+        }
       } catch (error) {
         console.error('Failed to create user', error);
       }
